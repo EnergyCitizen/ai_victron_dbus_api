@@ -1,0 +1,463 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2025-10-23",
+    "api_endpoint": "http://192.168.88.77:8088",
+    "device": "Cerbo GX",
+    "firmware": "v3.70~33"
+  },
+  "critical_paths": {
+    "battery_soc": {
+      "service": "com.victronenergy.system",
+      "path": "/Dc/Battery/Soc",
+      "type": "float",
+      "unit": "%",
+      "poll_interval_seconds": 10,
+      "critical_threshold_low": 10,
+      "warning_threshold": 20,
+      "description": "Battery state of charge - PRIMARY METRIC"
+    },
+    "battery_voltage": {
+      "service": "com.victronenergy.system",
+      "path": "/Dc/Battery/Voltage",
+      "type": "float",
+      "unit": "V",
+      "poll_interval_seconds": 10,
+      "min_safe": 45,
+      "max_safe": 53,
+      "description": "Battery pack voltage"
+    },
+    "battery_current": {
+      "service": "com.victronenergy.system",
+      "path": "/Dc/Battery/Current",
+      "type": "float",
+      "unit": "A",
+      "poll_interval_seconds": 10,
+      "note": "Negative = discharging, Positive = charging",
+      "description": "Battery current flow"
+    },
+    "battery_power": {
+      "service": "com.victronenergy.system",
+      "path": "/Dc/Battery/Power",
+      "type": "float",
+      "unit": "W",
+      "poll_interval_seconds": 10,
+      "note": "Negative = discharging, Positive = charging",
+      "description": "Battery power"
+    },
+    "grid_power": {
+      "service": "com.victronenergy.system",
+      "path": "/Ac/Grid/L1/Power",
+      "type": "int",
+      "unit": "W",
+      "poll_interval_seconds": 10,
+      "description": "Grid power import/export"
+    },
+    "grid_lost_alarm": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/Alarms/GridLost",
+      "type": "bool",
+      "poll_interval_seconds": 5,
+      "critical": true,
+      "description": "Grid connection lost - CRITICAL ALERT"
+    },
+    "bms_connection_lost": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/Alarms/BmsConnectionLost",
+      "type": "bool",
+      "poll_interval_seconds": 5,
+      "critical": true,
+      "description": "Battery management system offline - CRITICAL ALERT"
+    },
+    "inverter_mode": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/Mode",
+      "type": "int",
+      "poll_interval_seconds": 30,
+      "enum": {
+        "1": "Charger",
+        "2": "Inverter",
+        "3": "Passthrough"
+      },
+      "description": "Inverter/Charger operating mode"
+    },
+    "inverter_state": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/State",
+      "type": "int",
+      "poll_interval_seconds": 30,
+      "enum": {
+        "0": "Off",
+        "1": "Low Power",
+        "2": "Fault",
+        "3": "Bulk",
+        "4": "Absorption",
+        "5": "Float",
+        "9": "Inverting"
+      },
+      "description": "Inverter charging state machine"
+    }
+  },
+  "health_monitoring": {
+    "state_of_health": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/Soh",
+      "type": "float",
+      "unit": "%",
+      "poll_interval_seconds": 300,
+      "warning_threshold": 85,
+      "critical_threshold": 70,
+      "description": "Battery health percentage - battery aging indicator"
+    },
+    "battery_temperature": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/Dc/0/Temperature",
+      "type": "float",
+      "unit": "C",
+      "poll_interval_seconds": 60,
+      "normal_range": "20-40",
+      "warning_threshold": 50,
+      "critical_threshold": 55,
+      "description": "Battery pack temperature"
+    },
+    "max_cell_voltage": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/System/MaxCellVoltage",
+      "type": "float",
+      "unit": "V",
+      "poll_interval_seconds": 60,
+      "warning_threshold": 3.35,
+      "critical_threshold": 3.4,
+      "description": "Highest cell voltage - indicates imbalance if high"
+    },
+    "min_cell_voltage": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/System/MinCellVoltage",
+      "type": "float",
+      "unit": "V",
+      "poll_interval_seconds": 60,
+      "warning_threshold": 3.1,
+      "critical_threshold": 3.0,
+      "description": "Lowest cell voltage - indicates imbalance if low"
+    },
+    "cell_imbalance_alarm": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/Alarms/CellImbalance",
+      "type": "bool",
+      "poll_interval_seconds": 30,
+      "description": "Cell voltage imbalance detected - aging indicator"
+    },
+    "modules_offline": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/System/NrOfModulesOffline",
+      "type": "int",
+      "poll_interval_seconds": 60,
+      "critical_if_greater_than": 0,
+      "description": "Number of offline battery modules"
+    },
+    "charge_blocked": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/Alarms/ChargeBlocked",
+      "type": "bool",
+      "poll_interval_seconds": 30,
+      "description": "Battery charging blocked by BMS"
+    },
+    "discharge_blocked": {
+      "service": "com.victronenergy.battery.socketcan_can0",
+      "path": "/Alarms/DischargeBlocked",
+      "type": "bool",
+      "poll_interval_seconds": 30,
+      "description": "Battery discharging blocked by BMS"
+    }
+  },
+  "grid_quality": {
+    "grid_frequency": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/Ac/ActiveIn/L1/F",
+      "type": "float",
+      "unit": "Hz",
+      "poll_interval_seconds": 30,
+      "normal_range": "50 +/- 0.1",
+      "warning_threshold_min": 49.5,
+      "warning_threshold_max": 50.5,
+      "critical_threshold_min": 49.0,
+      "critical_threshold_max": 51.0,
+      "description": "Grid frequency - indicates grid stability"
+    },
+    "grid_voltage": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/Ac/ActiveIn/L1/V",
+      "type": "float",
+      "unit": "V",
+      "poll_interval_seconds": 30,
+      "normal_range": "220-230",
+      "warning_low": 210,
+      "warning_high": 240,
+      "description": "Grid voltage on AC input"
+    },
+    "grid_connected": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/Ac/ActiveIn/Connected",
+      "type": "bool",
+      "poll_interval_seconds": 5,
+      "critical": true,
+      "description": "Grid connection status - 0=Disconnected, 1=Connected"
+    },
+    "inverter_output_voltage": {
+      "service": "com.victronenergy.vebus.ttyS4",
+      "path": "/Ac/Out/L1/V",
+      "type": "float",
+      "unit": "V",
+      "poll_interval_seconds": 30,
+      "normal_range": "220-230",
+      "description": "Inverter output voltage to loads"
+    }
+  },
+  "consumption_monitoring": {
+    "total_consumption": {
+      "service": "com.victronenergy.system",
+      "path": "/Ac/Consumption/L1/Power",
+      "type": "int",
+      "unit": "W",
+      "poll_interval_seconds": 10,
+      "description": "Total AC consumption power"
+    },
+    "grid_meter_connected": {
+      "service": "com.victronenergy.acload.cg_BX18600620015",
+      "path": "/Connected",
+      "type": "bool",
+      "poll_interval_seconds": 60,
+      "description": "Grid meter communication status"
+    },
+    "grid_meter_power": {
+      "service": "com.victronenergy.acload.cg_BX18600620015",
+      "path": "/Ac/Power",
+      "type": "float",
+      "unit": "W",
+      "poll_interval_seconds": 10,
+      "description": "Total power measured by grid meter"
+    }
+  },
+  "system_health": {
+    "firmware_version": {
+      "service": "com.victronenergy.platform",
+      "path": "/Firmware/Installed/Version",
+      "type": "string",
+      "poll_interval_seconds": 3600,
+      "description": "Current firmware version"
+    },
+    "firmware_build": {
+      "service": "com.victronenergy.platform",
+      "path": "/Firmware/Installed/Build",
+      "type": "string",
+      "poll_interval_seconds": 3600,
+      "description": "Firmware build timestamp"
+    },
+    "latest_firmware": {
+      "service": "com.victronenergy.platform",
+      "path": "/Firmware/Online/AvailableVersion",
+      "type": "string",
+      "poll_interval_seconds": 3600,
+      "description": "Latest available firmware online"
+    },
+    "vrm_last_contact": {
+      "service": "com.victronenergy.logger",
+      "path": "/Vrm/TimeLastContact",
+      "type": "int",
+      "unit": "unix_timestamp",
+      "poll_interval_seconds": 300,
+      "max_age_seconds": 600,
+      "description": "Last contact with Victron VRM portal"
+    },
+    "vrm_connection_error": {
+      "service": "com.victronenergy.logger",
+      "path": "/Vrm/ConnectionError",
+      "type": "int",
+      "poll_interval_seconds": 300,
+      "critical_if": 1,
+      "description": "VRM connection error flag"
+    },
+    "wifi_signal_strength": {
+      "service": "com.victronenergy.platform",
+      "path": "/Network/Wifi/SignalStrength",
+      "type": "int",
+      "unit": "%",
+      "poll_interval_seconds": 300,
+      "warning_threshold": 40,
+      "description": "WiFi signal strength percentage"
+    },
+    "disk_free_space": {
+      "service": "com.victronenergy.platform",
+      "path": "/ModificationChecks/DataPartitionFreeSpace",
+      "type": "int",
+      "unit": "bytes",
+      "poll_interval_seconds": 3600,
+      "warning_threshold_bytes": 524288000,
+      "critical_threshold_bytes": 104857600,
+      "description": "Free disk space for logging"
+    },
+    "data_partition_error": {
+      "service": "com.victronenergy.platform",
+      "path": "/Device/DataPartitionError",
+      "type": "bool",
+      "poll_interval_seconds": 3600,
+      "critical": true,
+      "description": "Filesystem error detected"
+    },
+    "can_bus_errors": {
+      "service": "com.victronenergy.platform",
+      "path": "/CanBus/Interface/can0/Statistics",
+      "type": "json",
+      "poll_interval_seconds": 300,
+      "description": "CAN bus error statistics - parse JSON for tx/rx errors"
+    }
+  },
+  "ess_control": {
+    "ess_state": {
+      "service": "com.victronenergy.system",
+      "path": "/Control/EssState",
+      "type": "int",
+      "poll_interval_seconds": 30,
+      "description": "ESS control state machine"
+    },
+    "active_soc_limit": {
+      "service": "com.victronenergy.system",
+      "path": "/Control/ActiveSocLimit",
+      "type": "float",
+      "unit": "%",
+      "poll_interval_seconds": 60,
+      "description": "Minimum SOC limit for discharge"
+    },
+    "hub4_max_discharge_power": {
+      "service": "com.victronenergy.hub4",
+      "path": "/MaxDischargePower",
+      "type": "float",
+      "unit": "W",
+      "poll_interval_seconds": 60,
+      "description": "Maximum discharging power limit"
+    },
+    "dynamic_ess_active": {
+      "service": "com.victronenergy.system",
+      "path": "/DynamicEss/Active",
+      "type": "int",
+      "poll_interval_seconds": 60,
+      "description": "Dynamic ESS (scheduled charging) active flag"
+    },
+    "dynamic_ess_target_soc": {
+      "service": "com.victronenergy.system",
+      "path": "/DynamicEss/TargetSoc",
+      "type": "int",
+      "unit": "%",
+      "poll_interval_seconds": 60,
+      "description": "Dynamic ESS target SOC for charging"
+    }
+  },
+  "batch_query_pattern": {
+    "description": "For efficiency, query entire service root path to get all values at once",
+    "example_services": [
+      {
+        "service": "com.victronenergy.system",
+        "path": "/",
+        "polling_frequency_seconds": 30,
+        "priority": "CRITICAL",
+        "expected_values": 150
+      },
+      {
+        "service": "com.victronenergy.vebus.ttyS4",
+        "path": "/",
+        "polling_frequency_seconds": 30,
+        "priority": "CRITICAL",
+        "expected_values": 200
+      },
+      {
+        "service": "com.victronenergy.battery.socketcan_can0",
+        "path": "/",
+        "polling_frequency_seconds": 60,
+        "priority": "HIGH",
+        "expected_values": 50
+      },
+      {
+        "service": "com.victronenergy.acload.cg_BX18600620015",
+        "path": "/",
+        "polling_frequency_seconds": 60,
+        "priority": "HIGH",
+        "expected_values": 30
+      },
+      {
+        "service": "com.victronenergy.platform",
+        "path": "/",
+        "polling_frequency_seconds": 300,
+        "priority": "MEDIUM",
+        "expected_values": 100
+      }
+    ]
+  },
+  "anomaly_detection_rules": {
+    "rules": [
+      {
+        "name": "Battery Critical Low",
+        "trigger": "Soc < 10%",
+        "service": "com.victronenergy.system",
+        "path": "/Dc/Battery/Soc",
+        "severity": "CRITICAL",
+        "action": "Alert operator, may limit operations"
+      },
+      {
+        "name": "Battery Critically High Temperature",
+        "trigger": "Temperature > 55C",
+        "service": "com.victronenergy.battery.socketcan_can0",
+        "path": "/Dc/0/Temperature",
+        "severity": "CRITICAL",
+        "action": "Reduce load, check cooling system"
+      },
+      {
+        "name": "Cell Imbalance Detected",
+        "trigger": "MaxCellVoltage - MinCellVoltage > 0.15V",
+        "service": "com.victronenergy.battery.socketcan_can0",
+        "path": "/System/Max/MinCellVoltage",
+        "severity": "WARNING",
+        "action": "Schedule battery maintenance/replacement"
+      },
+      {
+        "name": "Grid Lost",
+        "trigger": "GridLost == 1",
+        "service": "com.victronenergy.vebus.ttyS4",
+        "path": "/Alarms/GridLost",
+        "severity": "CRITICAL",
+        "action": "System in UPS mode, limited runtime"
+      },
+      {
+        "name": "Grid Frequency Out of Range",
+        "trigger": "Frequency < 49.5 or > 50.5 Hz",
+        "service": "com.victronenergy.vebus.ttyS4",
+        "path": "/Ac/ActiveIn/L1/F",
+        "severity": "WARNING",
+        "action": "Grid instability detected"
+      },
+      {
+        "name": "CAN Bus Errors Growing",
+        "trigger": "Error count increase > 100 in 5 minutes",
+        "service": "com.victronenergy.platform",
+        "path": "/CanBus/Interface/can0/Statistics",
+        "severity": "WARNING",
+        "action": "Check CAN wiring, connectors, termination"
+      },
+      {
+        "name": "VRM Connection Lost",
+        "trigger": "TimeLastContact > 600 seconds",
+        "service": "com.victronenergy.logger",
+        "path": "/Vrm/TimeLastContact",
+        "severity": "WARNING",
+        "action": "Cloud connectivity issue"
+      },
+      {
+        "name": "Firmware Outdated",
+        "trigger": "InstalledVersion != LatestVersion",
+        "service": "com.victronenergy.platform",
+        "path": "/Firmware/Installed/Version",
+        "severity": "INFO",
+        "action": "Schedule firmware update"
+      }
+    ]
+  }
+}

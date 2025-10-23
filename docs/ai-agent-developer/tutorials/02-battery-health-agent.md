@@ -2,7 +2,7 @@
 
 **Duration**: 60 minutes hands-on
 **Level**: Intermediate
-**Prerequisites**: Basic Python, API knowledge, completed [Tutorial 01](../tutorials/01-quick-start-monitoring.md)
+**Prerequisites**: Basic Python, API knowledge, completed [Tutorial 01](./01-first-monitoring-agent.md)
 
 Learn to build an AI agent that monitors battery State of Health (SOH) over time, predicts replacement dates, and generates natural language health reports.
 

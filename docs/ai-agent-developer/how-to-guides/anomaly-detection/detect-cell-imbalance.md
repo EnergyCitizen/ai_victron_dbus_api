@@ -669,7 +669,7 @@ Expected Agent Response:
 
 ### How-To Guides
 - [Detect Battery Degradation](./detect-battery-degradation.md) - SOH monitoring
-- [Battery Not Charging](../../installer/how-to-guides/troubleshooting/battery-not-charging.md) - Charge issues
+- [Battery Not Charging](../../../installer/how-to-guides/troubleshooting/battery-not-charging.md) - Charge issues
 
 ### Tutorials
 - [Tutorial 02: Battery Health Agent](../../tutorials/02-battery-health-agent.md) - Complete implementation

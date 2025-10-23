@@ -77,9 +77,9 @@ Thank you for your interest in contributing! This project welcomes contributions
 
 ```bash
 # Fork repository on GitHub first, then:
-git clone git@github.com:YOUR_USERNAME/victron_dbus_api.git
-cd victron_dbus_api
-git remote add upstream git@github.com:EnergyCitizen/victron_dbus_api.git
+git clone git@github.com:YOUR_USERNAME/ai_victron_dbus_api.git
+cd ai_victron_dbus_api
+git remote add upstream git@github.com:EnergyCitizen/ai_victron_dbus_api.git
 ```
 
 ### 2. Create Feature Branch

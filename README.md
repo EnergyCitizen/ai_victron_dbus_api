@@ -1,10 +1,10 @@
 # Victron DBus API for AI Agents
 
-[![](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
-
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://python.org)
 [![Victron](https://img.shields.io/badge/Victron-Venus%20OS-orange)](https://github.com/victronenergy/venus)
+[![Contributors](https://img.shields.io/github/contributors/EnergyCitizen/victron_dbus_api)](https://github.com/EnergyCitizen/victron_dbus_api/graphs/contributors)
+[![Stars](https://img.shields.io/github/stars/EnergyCitizen/victron_dbus_api?style=social)](https://github.com/EnergyCitizen/victron_dbus_api/stargazers)
 
 > Read-only HTTP REST API server for Victron Venus OS devices, enabling AI agents to monitor and diagnose solar/battery systems at scale.
 
@@ -551,6 +551,8 @@ We welcome contributions from:
 ---
 
 <div align="center">
+
+[![](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
 
 **Made in Ukraine 🇺🇦 with love by [EnergyCitizen](https://github.com/EnergyCitizen)**
 

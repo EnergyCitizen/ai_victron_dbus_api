@@ -1,3 +1,5 @@
+[![](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner2-direct.svg)](https://github.com/vshymanskyy/StandWithUkraine/blob/main/docs/README.md)
+
 # Victron DBus API Research & Implementation Documentation
 
 Complete research and implementation guides for AI agents monitoring Victron VRM stations via the DBus HTTP API.

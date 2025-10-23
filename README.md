@@ -977,3 +977,11 @@ MIT License - See [LICENSE](LICENSE) file for details.
 **Version**: 1.1.0
 **Last Updated**: 2025-10-23
 **Maintainers**: @podarok, EnergyCitizen team
+
+---
+
+<div align="center">
+
+**Made in Ukraine 🇺🇦 with love by [EnergyCitizen](https://github.com/EnergyCitizen)**
+
+</div>

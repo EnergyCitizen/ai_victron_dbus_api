@@ -24,7 +24,7 @@ import time
 from datetime import datetime
 
 # Configuration
-VERSION = '3.1.0'
+VERSION = '3.2.0'
 DEFAULT_PORT = 8088
 DEFAULT_HOST = '0.0.0.0'
 CONFIG_DIR = '/data/dbus-api'
@@ -158,7 +158,10 @@ class DBusInterface:
             return False, f"Error checking AI_write switch: {e}", details
 
     def get_all_settings(self):
-        """Get all settings from com.victronenergy.settings"""
+        """Get all settings from com.victronenergy.settings
+
+        Returns: Dict of settings, or empty dict on error
+        """
         try:
             obj = self.bus.get_object('com.victronenergy.settings', '/')
             interface = dbus.Interface(obj, 'com.victronenergy.BusItem')
@@ -166,32 +169,76 @@ class DBusInterface:
 
             # Convert dbus types to Python native types
             return self._convert_dbus_dict(items)
+        except dbus.exceptions.DBusException as e:
+            logger.error(f"DBus error getting all settings: {e}")
+            return {}
         except Exception as e:
-            logger.error(f"Error getting all settings: {e}")
-            raise
+            logger.error(f"Unexpected error getting all settings: {e}")
+            return {}
 
-    def get_value(self, service, path):
-        """Get value from specific dbus path"""
+    def get_value(self, service, path, raise_on_error=False):
+        """Get value from specific dbus path
+
+        Args:
+            service: DBus service name
+            path: DBus object path
+            raise_on_error: If True, raises exception on error. If False (default), returns None.
+
+        Returns:
+            The value, or None if path doesn't exist or error occurred
+        """
         try:
             obj = self.bus.get_object(service, path)
             interface = dbus.Interface(obj, 'com.victronenergy.BusItem')
             value = interface.GetValue()
             return self._convert_dbus_value(value)
+        except dbus.exceptions.DBusException as e:
+            # Common DBus errors - log at debug level, don't crash
+            error_name = getattr(e, '_dbus_error_name', str(e))
+            if 'UnknownObject' in str(e) or 'UnknownMethod' in str(e) or "doesn't exist" in str(e):
+                logger.debug(f"Path not available: {service}{path} - {error_name}")
+            else:
+                logger.warning(f"DBus error getting value from {service}{path}: {e}")
+            if raise_on_error:
+                raise
+            return None
         except Exception as e:
-            logger.error(f"Error getting value from {service}{path}: {e}")
-            raise
+            logger.error(f"Unexpected error getting value from {service}{path}: {e}")
+            if raise_on_error:
+                raise
+            return None
 
 
-    def get_text(self, service, path):
-        """Get text representation of value"""
+    def get_text(self, service, path, raise_on_error=False):
+        """Get text representation of value
+
+        Args:
+            service: DBus service name
+            path: DBus object path
+            raise_on_error: If True, raises exception on error. If False (default), returns None.
+
+        Returns:
+            The text value, or None if path doesn't exist or error occurred
+        """
         try:
             obj = self.bus.get_object(service, path)
             interface = dbus.Interface(obj, 'com.victronenergy.BusItem')
             text = interface.GetText()
             return str(text)
+        except dbus.exceptions.DBusException as e:
+            error_name = getattr(e, '_dbus_error_name', str(e))
+            if 'UnknownObject' in str(e) or 'UnknownMethod' in str(e) or "doesn't exist" in str(e):
+                logger.debug(f"Path not available: {service}{path} - {error_name}")
+            else:
+                logger.warning(f"DBus error getting text from {service}{path}: {e}")
+            if raise_on_error:
+                raise
+            return None
         except Exception as e:
-            logger.error(f"Error getting text from {service}{path}: {e}")
-            raise
+            logger.error(f"Unexpected error getting text from {service}{path}: {e}")
+            if raise_on_error:
+                raise
+            return None
 
     def set_value(self, service, path, value):
         """Set value at specific dbus path
@@ -200,18 +247,26 @@ class DBusInterface:
         the value against min/max constraints before writing.
 
         Returns: 0 on success, -1 on error (value out of range, invalid type, etc.)
+        Raises: Exception only for unexpected errors
         """
         try:
             obj = self.bus.get_object(service, path)
             interface = dbus.Interface(obj, 'com.victronenergy.BusItem')
             result = interface.SetValue(value)
             return int(result)
+        except dbus.exceptions.DBusException as e:
+            logger.warning(f"DBus error setting value at {service}{path}: {e}")
+            # Return -1 instead of crashing - let handler decide response
+            return -1
         except Exception as e:
-            logger.error(f"Error setting value at {service}{path}: {e}")
-            raise
+            logger.error(f"Unexpected error setting value at {service}{path}: {e}")
+            return -1
 
     def list_services(self):
-        """List all available dbus services"""
+        """List all available dbus services
+
+        Returns: List of victron services, or empty list on error
+        """
         try:
             obj = self.bus.get_object('org.freedesktop.DBus', '/org/freedesktop/DBus')
             interface = dbus.Interface(obj, 'org.freedesktop.DBus')
@@ -219,9 +274,12 @@ class DBusInterface:
             # Filter for victron services
             victron_services = [s for s in services if 'victron' in s.lower()]
             return sorted(victron_services)
+        except dbus.exceptions.DBusException as e:
+            logger.error(f"DBus error listing services: {e}")
+            return []
         except Exception as e:
-            logger.error(f"Error listing services: {e}")
-            raise
+            logger.error(f"Unexpected error listing services: {e}")
+            return []
 
     def _convert_dbus_value(self, value):
         """Convert dbus types to Python native types"""
@@ -382,12 +440,22 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
                     return
 
                 value = self.dbus_interface.get_value(service, dbus_path)
-                self._send_json({
-                    'service': service,
-                    'path': dbus_path,
-                    'value': value,
-                    'success': True
-                })
+                if value is None:
+                    # Path doesn't exist or error occurred - return 404 with helpful message
+                    self._send_json({
+                        'service': service,
+                        'path': dbus_path,
+                        'value': None,
+                        'error': f'Path {dbus_path} not available on {service}',
+                        'success': False
+                    }, 404)
+                else:
+                    self._send_json({
+                        'service': service,
+                        'path': dbus_path,
+                        'value': value,
+                        'success': True
+                    })
 
             # Route: GET /text
             elif path == '/text':
@@ -399,12 +467,22 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
                     return
 
                 text = self.dbus_interface.get_text(service, dbus_path)
-                self._send_json({
-                    'service': service,
-                    'path': dbus_path,
-                    'text': text,
-                    'success': True
-                })
+                if text is None:
+                    # Path doesn't exist or error occurred - return 404 with helpful message
+                    self._send_json({
+                        'service': service,
+                        'path': dbus_path,
+                        'text': None,
+                        'error': f'Path {dbus_path} not available on {service}',
+                        'success': False
+                    }, 404)
+                else:
+                    self._send_json({
+                        'service': service,
+                        'path': dbus_path,
+                        'text': text,
+                        'success': True
+                    })
 
             else:
                 self._send_error_json('Not found', 404)
@@ -459,17 +537,14 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
                     self._send_error_json('Missing value in request body', 400)
                     return
 
-                # Get current value first for comparison
-                try:
-                    old_value = self.dbus_interface.get_value(service, dbus_path)
-                except Exception:
-                    old_value = None
+                # Get current value first for comparison (returns None if unavailable)
+                old_value = self.dbus_interface.get_value(service, dbus_path)
 
-                # Set the new value
+                # Set the new value (returns -1 on error, 0 on success)
                 result = self.dbus_interface.set_value(service, dbus_path, value)
 
                 if result == 0:
-                    # Get new value to confirm
+                    # Get new value to confirm (returns None if unavailable)
                     new_value = self.dbus_interface.get_value(service, dbus_path)
                     logger.info(f"Value set: {service}{dbus_path} = {value} (was: {old_value})")
                     self._send_json({
@@ -480,10 +555,14 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
                         'success': True
                     })
                 else:
-                    self._send_error_json(
-                        'Failed to set value (value may be out of range or invalid type)',
-                        400
-                    )
+                    self._send_json({
+                        'error': 'Failed to set value',
+                        'reason': 'Value may be out of range, invalid type, or path does not support writing',
+                        'service': service,
+                        'path': dbus_path,
+                        'requested_value': value,
+                        'success': False
+                    }, 400)
 
             # Route: POST /config
             elif path == '/config':

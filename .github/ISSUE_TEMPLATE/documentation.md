@@ -18,7 +18,7 @@ Describe what's confusing or what should be added.
 How should it be improved?
 
 ## For Which Persona?
-- [ ] AI Agent Developer (Mauk)
+- [ ] AI Agent Developer
 - [ ] Victron Installer
 - [ ] Both
 

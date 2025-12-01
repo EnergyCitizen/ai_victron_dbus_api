@@ -8,7 +8,7 @@ assignees: ''
 
 ## Persona
 Which persona would benefit from this?
-- [ ] AI Agent Developer (Mauk)
+- [ ] AI Agent Developer
 - [ ] Victron Installer/Maintainer
 - [ ] Both
 

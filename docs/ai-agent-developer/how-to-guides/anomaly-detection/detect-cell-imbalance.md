@@ -6,7 +6,7 @@ Guide for building AI agents that detect battery cell voltage imbalance before i
 
 ## User Story
 
-**As Mauk (AI Agent Developer at El Niño)**, I want my monitoring agent to detect cell voltage imbalance early, so that I can prevent battery failures and extend battery lifespan by addressing balancing issues before cells degrade.
+**As an AI Agent Developer**, I want my monitoring agent to detect cell voltage imbalance early, so that I can prevent battery failures and extend battery lifespan by addressing balancing issues before cells degrade.
 
 ---
 

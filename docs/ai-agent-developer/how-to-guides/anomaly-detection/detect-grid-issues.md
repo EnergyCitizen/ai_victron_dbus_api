@@ -6,7 +6,7 @@ Guide for building AI agents that detect grid instability, voltage problems, and
 
 ## User Story
 
-**As Mauk**, I want my AI agent to detect grid quality issues (frequency deviation, voltage sag/surge, outages) so that I can alert users before equipment damage occurs.
+**As an AI Developer**, I want my AI agent to detect grid quality issues (frequency deviation, voltage sag/surge, outages) so that I can alert users before equipment damage occurs.
 
 ---
 

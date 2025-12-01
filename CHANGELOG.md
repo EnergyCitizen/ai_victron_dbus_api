@@ -13,8 +13,8 @@ Complete documentation reorganization following Diataxis framework with persona-
 ### Added
 
 **Foundation**:
-- LICENSE (MIT + authorized use for El Niño and Victron Energy)
-- PERSONAS.md (Mauk Muller AI developer + Victron Installer profiles)
+- LICENSE (MIT + authorized use for Victron AI ecosystem partners and Victron Energy)
+- PERSONAS.md (AI Developer + Victron Installer profiles)
 - CONTRIBUTING.md (contribution guidelines)
 - .github/FUNDING.yml (sponsorship support)
 - .github/ISSUE_TEMPLATE/ (bug report, feature request, documentation templates)

@@ -12,7 +12,7 @@ Comprehensive suggestions for enhancing the Victron DBus API repository.
 
 ### Documentation Structure
 - ✅ Diataxis framework implementation
-- ✅ Persona-based organization (Mauk + Installer)
+- ✅ Persona-based organization (AI Developer + Installer)
 - ✅ 60+ focused guides (100-500 lines each)
 - ✅ Zero broken links
 - ✅ Made in Ukraine footer on all docs
@@ -185,11 +185,11 @@ CMD ["python3", "/app/dbus_api_server.py"]
 **Create**:
 - Discord/Slack channel for real-time help
 - Monthly community call (share use cases)
-- Showcase: User stories from Mauk, installers
+- Showcase: User stories from AI developers, installers
 - Blog: Technical deep dives
 
 **Partner With**:
-- El Niño: Official AI ecosystem collaboration
+- AI ecosystem partners: Official collaboration
 - Victron Community: Cross-promotion
 - Home Assistant: Integration guide
 - Node-RED: Flow examples
@@ -354,8 +354,8 @@ brew install victron-dbus-api
 
 ### Partnerships
 
-**El Niño (Mauk)**:
-- Official AI ecosystem partnership announcement
+**AI Ecosystem Partners**:
+- Official partnership announcements
 - Co-marketing: Case studies, webinars
 - Beta access to VRM ProxyRelay integration
 

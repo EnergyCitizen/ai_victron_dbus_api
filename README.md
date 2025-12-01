@@ -18,8 +18,8 @@
 
 ### 🤖 AI Agent Developer
 
-**You are**: Mauk Muller (or similar)
-**Company**: El Niño, building AI monitoring solutions
+**You are**: An AI Agent Developer
+**Company**: Building AI monitoring solutions for Victron
 **Goal**: Build conversational agents for Victron fleet monitoring
 
 **Your Question**:
@@ -115,7 +115,7 @@ Agent: "Battery is at 73%, discharging at 8A. About 5 hours remaining at current
 
 ```
 docs/
-├── ai-agent-developer/     # For Mauk - Build AI monitoring agents
+├── ai-agent-developer/     # Build AI monitoring agents
 │   ├── tutorials/          # Learn step-by-step (30-120 min)
 │   ├── how-to-guides/      # Solve specific problems (10-30 min)
 │   ├── concepts/           # Understand "why" (15-25 min)
@@ -250,7 +250,7 @@ Agent: "Site 3 battery is at 73%, charging at 15A.
 
 ## 📖 Learning Paths
 
-### For Mauk (AI Developer)
+### For AI Developer
 
 **Week 1 - Beginner**:
 1. [Tutorial 01: First Monitoring Agent](docs/ai-agent-developer/tutorials/01-first-monitoring-agent.md) (30 min)
@@ -299,7 +299,7 @@ Agent: "Site 3 battery is at 73%, charging at 15A.
 
 ## 🎓 What You'll Learn
 
-### AI Agent Developers (Mauk)
+### AI Agent Developers
 - ✅ Build conversational monitoring agents (30 min tutorial)
 - ✅ Implement natural language queries ("Show me battery health")
 - ✅ Detect anomalies early (battery degradation, grid issues)
@@ -376,7 +376,7 @@ Agent: "Battery health is excellent at 96% SOH. It's aging normally (0.2%/month)
 | Document | Description | Persona |
 |----------|-------------|---------|
 | [PERSONAS.md](PERSONAS.md) | Detailed persona profiles | Both |
-| [AI Agent Developer Docs](docs/ai-agent-developer/) | Build conversational monitoring agents | Mauk |
+| [AI Agent Developer Docs](docs/ai-agent-developer/) | Build conversational monitoring agents | AI Developer |
 | [Installer Docs](docs/installer/) | Troubleshoot and validate systems | Installer |
 | [DOCS_RESTRUCTURE_PROPOSAL.md](DOCS_RESTRUCTURE_PROPOSAL.md) | How we organized this | Meta |
 
@@ -384,7 +384,7 @@ Agent: "Battery health is excellent at 96% SOH. It's aging normally (0.2%/month)
 
 ## 🎬 Example Scenarios
 
-### For AI Developers (Mauk)
+### For AI Developers
 
 **Scenario**: Fleet battery health monitoring
 ```
@@ -516,7 +516,7 @@ We welcome contributions from:
 **MIT License** - See [LICENSE](LICENSE)
 
 **Authorized Use**: Explicitly permitted for:
-- **El Niño** (Victron AI ecosystem partner)
+- **Victron AI ecosystem partners**
 - **Victron Energy** (Venus OS platform provider)
 
 ---
@@ -525,7 +525,6 @@ We welcome contributions from:
 
 - **GitHub**: [EnergyCitizen/ai_victron_dbus_api](https://github.com/EnergyCitizen/ai_victron_dbus_api)
 - **Victron Community**: [community.victronenergy.com](https://community.victronenergy.com)
-- **El Niño AI**: Contact Mauk Muller for AI ecosystem collaboration
 - **Support**: [GitHub Issues](https://github.com/EnergyCitizen/ai_victron_dbus_api/issues)
 
 ---
@@ -544,7 +543,7 @@ We welcome contributions from:
 
 ## 🎯 Success Stories
 
-**Mauk (El Niño)**: "Built fleet monitoring agent in 2 hours using Tutorial 01 and detect-battery-degradation guide. Now monitoring 50+ sites with proactive alerts."
+**AI Developer**: "Built fleet monitoring agent in 2 hours using Tutorial 01 and detect-battery-degradation guide. Now monitoring 50+ sites with proactive alerts."
 
 **Installer**: "Diagnosed 'battery not charging' remotely in 10 minutes using AI agent. Issue was high temperature. No truck roll needed. Customer happy."
 

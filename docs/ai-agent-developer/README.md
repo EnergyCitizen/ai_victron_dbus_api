@@ -1,10 +1,9 @@
 # AI Agent Developer Documentation
 
-Welcome, Mauk! This documentation workspace is designed for AI agent developers building conversational interfaces for Victron system monitoring.
+Welcome! This documentation workspace is designed for AI agent developers building conversational interfaces for Victron system monitoring.
 
 ## 🤖 Your Profile
 
-- **Company**: El Niño (Victron AI ecosystem)
 - **Goal**: Build AI agents that monitor 50-100+ VRM installations
 - **Interaction**: Users talk to agents naturally, agents handle API calls
 - **Value**: Predictive maintenance, anomaly detection, cost savings

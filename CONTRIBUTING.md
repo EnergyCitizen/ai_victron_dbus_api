@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This project welcomes contributions
 
 ## 🤝 Ways to Contribute
 
-### For AI Agent Developers (Mauk's Persona)
+### For AI Agent Developers
 - **Share conversational patterns**: Document how your users interact with agents
 - **Add monitoring use cases**: New anomaly detection patterns
 - **Improve tutorials**: Enhance examples with real-world scenarios
@@ -64,7 +64,7 @@ Thank you for your interest in contributing! This project welcomes contributions
 
 ### Testing
 
-- **Documentation**: Test on target persona (Mauk or Installer)
+- **Documentation**: Test on target persona (AI Developer or Installer)
 - **Code**: Run on actual Venus OS device (Cerbo GX, Venus GX)
 - **Links**: Verify all cross-references work
 - **Examples**: Ensure conversational flows are realistic
@@ -124,7 +124,7 @@ gh pr create --title "Add solar production anomaly detection guide"
 
 **PR Description Should Include**:
 - Summary of changes
-- Which persona benefits (Mauk, Installer, or both)
+- Which persona benefits (AI Developer, Installer, or both)
 - Testing performed (which Venus OS devices)
 - Related issues or guides
 - Screenshots/examples if applicable
@@ -139,7 +139,7 @@ gh pr create --title "Add solar production anomaly detection guide"
 # [Guide Title]
 
 ## User Story
-**As [Mauk/Installer]**, I want my AI agent to [capability], so that [benefit].
+**As [AI Developer/Installer]**, I want my AI agent to [capability], so that [benefit].
 
 ## Business Value
 | Benefit | Value |
@@ -284,7 +284,7 @@ Use GitHub Issues with:
 ### Feature Requests
 
 Include:
-- **Persona**: Mauk (AI dev) or Installer
+- **Persona**: AI Developer or Installer
 - **User Story**: As [persona], I want..., so that...
 - **Use Case**: Real scenario where this helps
 - **Acceptance Criteria**: How to know it's done
@@ -325,7 +325,7 @@ Contributors will be:
 - Thanked in acknowledgments
 
 **Top contributors may be invited to**:
-- Collaborate with El Niño team
+- Collaborate with ecosystem partners
 - Beta test VRM ProxyRelay integration
 - Join Victron AI ecosystem partnership
 
@@ -341,7 +341,7 @@ Contributors will be:
 
 ## 📜 License
 
-By contributing, you agree that your contributions will be licensed under the MIT License with authorized use for El Niño and Victron Energy. See [LICENSE](LICENSE) for details.
+By contributing, you agree that your contributions will be licensed under the MIT License with authorized use for Victron AI ecosystem partners and Victron Energy. See [LICENSE](LICENSE) for details.
 
 ---
 

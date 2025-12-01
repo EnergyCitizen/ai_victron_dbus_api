@@ -1,0 +1,15 @@
+#!/bin/sh
+# Victron DBus API Server - daemontools run script
+# Main API server for DBus read/write operations (port 8088)
+
+exec 2>&1
+
+INSTALL_DIR="/data/dbus-api"
+SCRIPT="dbus_api_server.py"
+
+cd "$INSTALL_DIR" || exit 1
+
+# Wait for DBus to be available
+sleep 5
+
+exec python3 "$INSTALL_DIR/$SCRIPT"

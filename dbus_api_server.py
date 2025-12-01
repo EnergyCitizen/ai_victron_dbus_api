@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-Victron DBus API Server v3.0.0
+Victron DBus API Server v3.1.0
 A lightweight HTTP server that exposes Victron dbus values via REST API
-Runs as a daemon and provides read/write access to dbus system bus
+Runs as a daemontools service and provides read/write access to dbus system bus
 
 Safety Features:
 - AI Write Switch: Write operations require AI_write virtual switch to be ON
-- Configuration Storage: Installation-specific configs stored in /data/ai_agent/
+- Configuration Storage: Installation-specific configs stored in /data/dbus-api/
+
+Server management (start/stop/restart) is handled by dbus_api_control.py on port 8089
 """
 
 import dbus
@@ -18,14 +20,14 @@ from urllib.parse import urlparse, parse_qs
 import sys
 import signal
 import traceback
-import threading
 import time
 from datetime import datetime
 
 # Configuration
+VERSION = '3.1.0'
 DEFAULT_PORT = 8088
 DEFAULT_HOST = '0.0.0.0'
-CONFIG_DIR = '/data/ai_agent'
+CONFIG_DIR = '/data/dbus-api'
 CONFIG_FILE = os.path.join(CONFIG_DIR, 'config.json')
 
 # Setup logging
@@ -104,7 +106,7 @@ class DBusInterface:
             return False
 
     def is_ai_write_enabled(self):
-        """Check if AI_write switch is enabled (State != 0)
+        """Check if AI_write switch is enabled (State bit 0 = 1)
 
         Returns: (enabled: bool, message: str, details: dict)
         """
@@ -143,12 +145,11 @@ class DBusInterface:
         details['switch_found'] = True
 
         try:
-            state = self.get_value(self.ai_write_service, '/State')
+            # The actual switch state is at /SwitchableOutput/output_1/State (0=OFF, 1=ON)
+            # NOT at /State which is just metadata (always 256)
+            state = self.get_value(self.ai_write_service, '/SwitchableOutput/output_1/State')
             details['switch_state'] = state
-            # State is a bitmask: bit 0 = switch 1 state (1=ON, 0=OFF)
-            # Value 256 (bit 8) is metadata, not switch state
-            # Check bit 0 specifically for switch 1 ON/OFF
-            if state is not None and (int(state) & 1) == 1:
+            if state is not None and int(state) == 1:
                 return True, "AI_write is enabled", details
             else:
                 return False, "AI_write switch is OFF. Enable it in NodeRED or VRM to allow write operations.", details
@@ -255,8 +256,6 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
     """HTTP request handler for DBus API"""
 
     dbus_interface = None  # Shared DBus interface instance
-    server_instance = None  # Reference to HTTP server for restart/stop
-    restart_requested = False  # Flag for restart
     start_time = None  # Server start timestamp
 
     def _set_headers(self, status=200, content_type='application/json'):
@@ -293,23 +292,22 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
                 ai_enabled, ai_message, ai_details = self.dbus_interface.is_ai_write_enabled()
                 self._send_json({
                     'name': 'Victron DBus API Server',
-                    'version': '3.0.0',
+                    'version': VERSION,
                     'mode': 'read-write',
                     'ai_write_enabled': ai_enabled,
                     'ai_write_status': ai_message,
+                    'control_port': 8089,
                     'endpoints': {
                         'GET /': 'API information',
-                        'GET /settings': 'Get all settings from com.victronenergy.settings',
+                        'GET /health': 'Health check with uptime',
                         'GET /services': 'List all Victron dbus services',
+                        'GET /settings': 'Get all settings from com.victronenergy.settings',
                         'GET /value?service=X&path=Y': 'Get value from specific dbus path',
                         'GET /text?service=X&path=Y': 'Get text representation of value',
-                        'GET /health': 'Health check',
                         'GET /ai-write-status': 'Check AI write switch status',
-                        'GET /config': 'Get stored configuration',
+                        'GET /config': 'Get stored agent configuration',
                         'POST /value': 'Set value (requires AI_write switch ON)',
-                        'POST /config': 'Save configuration (JSON body)',
-                        'POST /restart': 'Restart API server (JSON body: {"confirm": true})',
-                        'POST /stop': 'Stop API server (JSON body: {"confirm": true})'
+                        'POST /config': 'Save agent configuration'
                     }
                 })
 
@@ -318,6 +316,8 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
                 uptime_seconds = int(time.time() - DBusAPIHandler.start_time) if DBusAPIHandler.start_time else 0
                 started_at = datetime.fromtimestamp(DBusAPIHandler.start_time).isoformat() if DBusAPIHandler.start_time else None
                 self._send_json({
+                    'service': 'dbus-api-server',
+                    'version': VERSION,
                     'status': 'healthy',
                     'started_at': started_at,
                     'uptime_seconds': uptime_seconds,
@@ -502,46 +502,6 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
                 except Exception as e:
                     self._send_error_json(f'Failed to save config: {e}', 500)
 
-            # Route: POST /restart
-            elif path == '/restart':
-                confirm = data.get('confirm', False)
-                if not confirm:
-                    self._send_error_json('Restart requires {"confirm": true} in request body', 400)
-                    return
-
-                logger.info("Restart requested via API")
-                self._send_json({
-                    'message': 'Server restarting...',
-                    'success': True
-                })
-
-                # Set restart flag and shutdown in separate thread to allow response to complete
-                DBusAPIHandler.restart_requested = True
-                def shutdown_server():
-                    if DBusAPIHandler.server_instance:
-                        DBusAPIHandler.server_instance.shutdown()
-                threading.Thread(target=shutdown_server, daemon=True).start()
-
-            # Route: POST /stop
-            elif path == '/stop':
-                confirm = data.get('confirm', False)
-                if not confirm:
-                    self._send_error_json('Stop requires {"confirm": true} in request body', 400)
-                    return
-
-                logger.info("Stop requested via API")
-                self._send_json({
-                    'message': 'Server stopping...',
-                    'success': True
-                })
-
-                # Shutdown in separate thread to allow response to complete
-                DBusAPIHandler.restart_requested = False
-                def shutdown_server():
-                    if DBusAPIHandler.server_instance:
-                        DBusAPIHandler.server_instance.shutdown()
-                threading.Thread(target=shutdown_server, daemon=True).start()
-
             else:
                 self._send_error_json('Not found', 404)
 
@@ -555,47 +515,36 @@ class DBusAPIHandler(BaseHTTPRequestHandler):
 
 
 def run_server(host=DEFAULT_HOST, port=DEFAULT_PORT):
-    """Run the HTTP server with restart support"""
-    while True:
-        try:
-            # Reset restart flag and set start time
-            DBusAPIHandler.restart_requested = False
-            DBusAPIHandler.start_time = time.time()
+    """Run the HTTP server"""
+    try:
+        # Set start time
+        DBusAPIHandler.start_time = time.time()
 
-            # Initialize DBus interface
-            dbus_interface = DBusInterface()
-            DBusAPIHandler.dbus_interface = dbus_interface
+        # Initialize DBus interface
+        dbus_interface = DBusInterface()
+        DBusAPIHandler.dbus_interface = dbus_interface
 
-            # Create server
-            server = HTTPServer((host, port), DBusAPIHandler)
-            DBusAPIHandler.server_instance = server
-            logger.info(f"Starting Victron DBus API Server v3.0.0 on {host}:{port}")
-            logger.info(f"Access API at http://{host}:{port}/")
+        # Create server
+        server = HTTPServer((host, port), DBusAPIHandler)
+        logger.info(f"Starting Victron DBus API Server v{VERSION} on {host}:{port}")
+        logger.info(f"Access API at http://{host}:{port}/")
+        logger.info(f"Server management available on port 8089")
 
-            # Handle shutdown gracefully
-            def signal_handler(sig, frame):
-                logger.info("Shutting down server (signal)...")
-                DBusAPIHandler.restart_requested = False
-                server.shutdown()
+        # Handle shutdown gracefully
+        def signal_handler(sig, frame):
+            logger.info("Shutting down server (signal)...")
+            server.shutdown()
+            sys.exit(0)
 
-            signal.signal(signal.SIGINT, signal_handler)
-            signal.signal(signal.SIGTERM, signal_handler)
+        signal.signal(signal.SIGINT, signal_handler)
+        signal.signal(signal.SIGTERM, signal_handler)
 
-            # Start server
-            server.serve_forever()
+        # Start server
+        server.serve_forever()
 
-            # Check if restart was requested
-            if DBusAPIHandler.restart_requested:
-                logger.info("Restarting server...")
-                server.server_close()
-                continue
-            else:
-                logger.info("Server stopped")
-                sys.exit(0)
-
-        except Exception as e:
-            logger.error(f"Failed to start server: {e}")
-            sys.exit(1)
+    except Exception as e:
+        logger.error(f"Failed to start server: {e}")
+        sys.exit(1)
 
 
 if __name__ == '__main__':

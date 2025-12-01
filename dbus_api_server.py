@@ -145,8 +145,10 @@ class DBusInterface:
         try:
             state = self.get_value(self.ai_write_service, '/State')
             details['switch_state'] = state
-            # State 0 = OFF, any other value (e.g., 256) = ON
-            if state and int(state) != 0:
+            # State is a bitmask: bit 0 = switch 1 state (1=ON, 0=OFF)
+            # Value 256 (bit 8) is metadata, not switch state
+            # Check bit 0 specifically for switch 1 ON/OFF
+            if state is not None and (int(state) & 1) == 1:
                 return True, "AI_write is enabled", details
             else:
                 return False, "AI_write switch is OFF. Enable it in NodeRED or VRM to allow write operations.", details

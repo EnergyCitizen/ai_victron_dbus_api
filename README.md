@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://python.org)
 [![Victron](https://img.shields.io/badge/Victron-Venus%20OS-orange)](https://github.com/victronenergy/venus)
-[![Version](https://img.shields.io/badge/Version-3.0.0-green)](https://github.com/EnergyCitizen/ai_victron_dbus_api/releases)
+[![Version](https://img.shields.io/badge/Version-3.1.0-green)](https://github.com/EnergyCitizen/ai_victron_dbus_api/releases)
 [![Contributors](https://img.shields.io/github/contributors/EnergyCitizen/ai_victron_dbus_api)](https://github.com/EnergyCitizen/ai_victron_dbus_api/graphs/contributors)
 [![Stars](https://img.shields.io/github/stars/EnergyCitizen/ai_victron_dbus_api?style=social)](https://github.com/EnergyCitizen/ai_victron_dbus_api/stargazers)
 
@@ -11,44 +11,54 @@
 
 ---
 
-## What's New in v3.0.0
+## What's New in v3.1.0
 
 | Feature | Description |
 |---------|-------------|
-| **Read-Write Mode** | AI agents can now write values to DBus (not just read) |
+| **Two-Server Architecture** | Separate servers for DBus operations (8088) and management (8089) |
+| **Daemontools Integration** | Proper Venus OS service management with auto-restart |
+| **Control Server** | Remote start/stop/restart/upgrade via dedicated API |
+| **Install Script** | One-command deployment with `install.sh` |
+| **Firmware Persistence** | Services survive Venus OS firmware updates |
+
+### v3.0.0 Features (included)
+
+| Feature | Description |
+|---------|-------------|
+| **Read-Write Mode** | AI agents can write values to DBus (not just read) |
 | **AI Safety Switch** | Write operations require `AI_write` virtual switch to be ON |
-| **Server Management** | Remote restart/stop via API endpoints |
 | **Health Monitoring** | Uptime tracking with `started_at` timestamp |
-| **Config Storage** | Persistent agent configuration at `/data/ai_agent/config.json` |
 | **NodeRED Flow** | Pre-built safety switch flow included |
 
 ---
 
-## Safety-First Architecture
-
-**All write operations require explicit user permission via the AI_write switch.**
+## Architecture
 
 ```
-┌─────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│  AI Agent   │────▶│  DBus API Server │────▶│  Venus OS DBus  │
-└─────────────┘     └────────┬─────────┘     └─────────────────┘
-                             │
-                    ┌────────▼─────────┐
-                    │  AI_write Switch │
-                    │  (NodeRED)       │
-                    │  ┌───┐           │
-                    │  │OFF│ = Blocked │
-                    │  │ ON│ = Allowed │
-                    │  └───┘           │
-                    └──────────────────┘
+┌─────────────┐     ┌──────────────────────┐     ┌─────────────────┐
+│  AI Agent   │────▶│  Main API Server     │────▶│  Venus OS DBus  │
+│             │     │  Port 8088           │     └─────────────────┘
+└─────────────┘     │  - Read/Write DBus   │
+                    │  - AI_write safety   │
+                    └──────────┬───────────┘
+                               │
+┌─────────────┐     ┌──────────▼───────────┐     ┌─────────────────┐
+│  Admin/Dev  │────▶│  Control Server      │────▶│  daemontools    │
+│             │     │  Port 8089           │     │  svc commands   │
+└─────────────┘     │  - Start/Stop/Restart│     └─────────────────┘
+                    │  - Upgrade (git pull)│
+                    │  - View logs         │
+                    └──────────────────────┘
+
+                    ┌──────────────────────┐
+                    │  AI_write Switch     │
+                    │  (NodeRED Virtual)   │
+                    │  ┌───┐               │
+                    │  │OFF│ = Writes blocked
+                    │  │ ON│ = Writes allowed
+                    │  └───┘               │
+                    └──────────────────────┘
 ```
-
-**User maintains full control:**
-- Toggle OFF → instantly blocks all AI write operations
-- Toggle ON → allows AI to make approved changes
-- Automate via NodeRED (time-based, presence-based, etc.)
-
-See [AGENTS.md](AGENTS.md) for AI agent safety guidelines.
 
 ---
 
@@ -60,20 +70,25 @@ See [AGENTS.md](AGENTS.md) for AI agent safety guidelines.
 - **NodeRED enabled** in Settings > Services
 - SSH access to Venus device
 
-### 2. Deploy API Server
+### 2. Install (One Command)
 
 ```bash
-# Copy server to Venus OS device
-scp dbus_api_server.py root@<DEVICE_IP>:/data/
-
-# SSH into device
+# Clone repository to Venus device
 ssh root@<DEVICE_IP>
+cd /data
+git clone https://github.com/EnergyCitizen/ai_victron_dbus_api.git dbus-api-repo
+cd dbus-api-repo
 
-# Start server
-python3 /data/dbus_api_server.py &
+# Run installer
+./install.sh
+```
 
-# Verify
-curl http://<DEVICE_IP>:8088/health
+Or manually copy files:
+
+```bash
+# From your workstation
+scp -r . root@<DEVICE_IP>:/data/dbus-api-repo/
+ssh root@<DEVICE_IP> "cd /data/dbus-api-repo && ./install.sh"
 ```
 
 ### 3. Import Safety Switch (NodeRED)
@@ -86,31 +101,31 @@ curl http://<DEVICE_IP>:8088/health
 ### 4. Test API
 
 ```bash
-# Check server info
-curl http://<DEVICE_IP>:8088/
+# Main server health
+curl http://<DEVICE_IP>:8088/health
+
+# Control server health
+curl http://<DEVICE_IP>:8089/health
 
 # Check AI write status
 curl http://<DEVICE_IP>:8088/ai-write-status
 
 # Read battery SOC
 curl "http://<DEVICE_IP>:8088/value?service=com.victronenergy.system&path=/Dc/Battery/Soc"
-
-# Write value (requires AI_write switch ON)
-curl -X POST http://<DEVICE_IP>:8088/value \
-  -H "Content-Type: application/json" \
-  -d '{"service": "com.victronenergy.settings", "path": "/Settings/Alarm/Audible", "value": 1}'
 ```
 
 ---
 
 ## API Reference
 
-### Read Endpoints
+### Main Server (Port 8088)
+
+#### Read Endpoints
 
 | Endpoint | Description |
 |----------|-------------|
 | `GET /` | API info, version, AI write status |
-| `GET /health` | Health check with uptime (`started_at`, `uptime_seconds`) |
+| `GET /health` | Health check with uptime |
 | `GET /services` | List all Victron DBus services |
 | `GET /settings` | All system settings (300+ values) |
 | `GET /value?service=X&path=Y` | Get specific DBus value |
@@ -118,111 +133,81 @@ curl -X POST http://<DEVICE_IP>:8088/value \
 | `GET /ai-write-status` | Detailed AI write switch diagnostics |
 | `GET /config` | Get stored agent configuration |
 
-### Write Endpoints
+#### Write Endpoints
 
 | Endpoint | Description | Requires |
 |----------|-------------|----------|
 | `POST /value` | Set DBus value | AI_write switch ON |
 | `POST /config` | Save agent configuration | - |
-| `POST /restart` | Restart API server | `{"confirm": true}` |
-| `POST /stop` | Stop API server | `{"confirm": true}` |
 
-### Example Responses
+### Control Server (Port 8089)
 
-<details>
-<summary><code>GET /</code> - API Info</summary>
+| Endpoint | Method | Description | Requires |
+|----------|--------|-------------|----------|
+| `/` | GET | Control server info | - |
+| `/health` | GET | Control server health | - |
+| `/status` | GET | Main server status (pid, uptime) | - |
+| `/logs` | GET | Recent log entries (?lines=N) | - |
+| `/start` | POST | Start main server | `{"confirm": true}` |
+| `/stop` | POST | Stop main server | `{"confirm": true}` |
+| `/restart` | POST | Restart main server | `{"confirm": true}` |
+| `/upgrade` | POST | Git pull + restart | `{"confirm": true}` |
 
-```json
-{
-  "name": "Victron DBus API Server",
-  "version": "3.0.0",
-  "mode": "read-write",
-  "ai_write_enabled": true,
-  "ai_write_status": "AI_write is enabled",
-  "endpoints": {
-    "GET /": "API information",
-    "GET /health": "Health check",
-    "GET /services": "List all Victron dbus services",
-    "GET /value?service=X&path=Y": "Get value from specific dbus path",
-    "POST /value": "Set value (requires AI_write switch ON)",
-    "POST /restart": "Restart API server",
-    "POST /stop": "Stop API server"
-  }
-}
-```
-</details>
+---
 
-<details>
-<summary><code>GET /health</code> - Health with Uptime</summary>
+## Server Management
 
-```json
-{
-  "status": "healthy",
-  "started_at": "2025-12-01T11:01:22.186090",
-  "uptime_seconds": 3600,
-  "success": true
-}
-```
-</details>
+### Via Control Server API
 
-<details>
-<summary><code>GET /ai-write-status</code> - Detailed Diagnostics</summary>
+```bash
+# Check main server status
+curl http://<DEVICE_IP>:8089/status
 
-```json
-{
-  "enabled": true,
-  "message": "AI_write is enabled",
-  "switch_service": "com.victronenergy.switch.virtual_6a7aeab51e5dd6e9",
-  "details": {
-    "venus_image_type": "Large",
-    "nodered_enabled": true,
-    "nodered_running": true,
-    "switch_found": true,
-    "switch_state": 256
-  },
-  "faq": {
-    "venus_large": "Venus OS Large includes NodeRED...",
-    "enable_nodered": "Enable NodeRED in Remote Console > Settings > Services",
-    "create_switch": "In NodeRED, add victron-virtual-switch with CustomName 'AI_write'",
-    "toggle_switch": "Control via VRM dashboard, Remote Console, or NodeRED"
-  },
-  "success": true
-}
-```
-</details>
+# Restart main server
+curl -X POST http://<DEVICE_IP>:8089/restart \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
 
-<details>
-<summary><code>POST /value</code> - Write Value</summary>
+# Stop main server
+curl -X POST http://<DEVICE_IP>:8089/stop \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
 
-**Request:**
-```json
-{
-  "service": "com.victronenergy.settings",
-  "path": "/Settings/Alarm/Audible",
-  "value": 1
-}
+# Upgrade (git pull + restart)
+curl -X POST http://<DEVICE_IP>:8089/upgrade \
+  -H "Content-Type: application/json" \
+  -d '{"confirm": true}'
+
+# View logs
+curl "http://<DEVICE_IP>:8089/logs?lines=100"
 ```
 
-**Response (success):**
-```json
-{
-  "service": "com.victronenergy.settings",
-  "path": "/Settings/Alarm/Audible",
-  "value": 1,
-  "previous_value": 0,
-  "success": true
-}
+### Via SSH (daemontools)
+
+```bash
+# Check service status
+svstat /service/dbus-api-server
+svstat /service/dbus-api-control
+
+# Restart main server
+svc -t /service/dbus-api-server
+
+# Stop main server
+svc -d /service/dbus-api-server
+
+# Start main server
+svc -u /service/dbus-api-server
+
+# View logs
+tail -f /var/log/dbus-api-server/current
 ```
 
-**Response (blocked):**
-```json
-{
-  "error": "AI write is disabled",
-  "message": "AI_write switch is OFF. Enable it in NodeRED or VRM.",
-  "success": false
-}
+### Uninstall
+
+```bash
+cd /data/dbus-api-repo
+./uninstall.sh
 ```
-</details>
 
 ---
 
@@ -241,22 +226,12 @@ curl -X POST http://<DEVICE_IP>:8088/value \
 
 ## AI Agent Integration
 
-### Conversational Example
-
-```
-User: "What's the battery level?"
-
-Agent: [Calls GET /value?service=com.victronenergy.system&path=/Dc/Battery/Soc]
-
-Agent: "Battery is at 73%, discharging at 8A. About 5 hours remaining."
-```
-
 ### Write with Safety Check
 
 ```python
 import requests
 
-BASE_URL = "http://192.168.88.189:8088"
+BASE_URL = "http://192.168.88.77:8088"
 
 # 1. Check if writes are allowed
 status = requests.get(f"{BASE_URL}/ai-write-status").json()
@@ -281,81 +256,26 @@ if response.json()["success"]:
 
 ```
 ai_victron_dbus_api/
-├── dbus_api_server.py          # Main API server (v3.0.0)
+├── dbus_api_server.py          # Main API server (port 8088)
+├── dbus_api_control.py         # Control server (port 8089)
+├── install.sh                  # Installation script
+├── uninstall.sh                # Uninstallation script
+├── service/
+│   ├── dbus-api-server/        # Main server daemontools service
+│   │   ├── run
+│   │   └── log/run
+│   └── dbus-api-control/       # Control server daemontools service
+│       ├── run
+│       └── log/run
 ├── nodered/
-│   └── safety_switch.json      # AI_write switch flow (import to NodeRED)
+│   └── safety_switch.json      # AI_write switch flow
 ├── docs/
 │   ├── ai-agent-developer/     # Build AI monitoring agents
 │   └── installer/              # Troubleshoot & validate systems
 ├── AGENTS.md                   # AI agent safety guidelines
 ├── CLAUDE.md                   # Claude Code safety instructions
-├── CONTRIBUTING.md             # Contribution guidelines
 └── README.md                   # This file
 ```
-
----
-
-## Documentation
-
-### By Persona
-
-| Persona | Start Here | Focus |
-|---------|------------|-------|
-| **AI Agent Developer** | [docs/ai-agent-developer/](docs/ai-agent-developer/) | Build conversational monitoring agents |
-| **Victron Installer** | [docs/installer/](docs/installer/) | Troubleshoot & validate systems |
-
-### Quick Links
-
-**Tutorials:**
-- [First Monitoring Agent](docs/ai-agent-developer/tutorials/01-first-monitoring-agent.md) (30 min)
-- [Validate New Installation](docs/installer/tutorials/01-validate-new-installation.md) (20 min)
-
-**How-To Guides:**
-- [Detect Battery Degradation](docs/ai-agent-developer/how-to-guides/anomaly-detection/detect-battery-degradation.md)
-- [Battery Not Charging](docs/installer/how-to-guides/troubleshooting/battery-not-charging.md)
-
-**Reference:**
-- [Critical API Paths](docs/ai-agent-developer/reference/api/critical-paths.md)
-- [Troubleshooting Matrix](docs/installer/reference/troubleshooting-matrix.md)
-
----
-
-## Server Management
-
-### Remote Restart
-
-```bash
-curl -X POST http://<DEVICE_IP>:8088/restart \
-  -H "Content-Type: application/json" \
-  -d '{"confirm": true}'
-```
-
-### Remote Stop
-
-```bash
-curl -X POST http://<DEVICE_IP>:8088/stop \
-  -H "Content-Type: application/json" \
-  -d '{"confirm": true}'
-```
-
-### Check Uptime
-
-```bash
-curl http://<DEVICE_IP>:8088/health
-# Returns started_at timestamp and uptime_seconds
-```
-
-### Safe Process Management
-
-```bash
-# Stop ONLY the API server (safe)
-pkill -f dbus_api_server.py
-
-# NEVER run this on Venus OS:
-# killall python3  # DANGEROUS - kills critical system services!
-```
-
-See [CLAUDE.md](CLAUDE.md) for critical safety rules.
 
 ---
 
@@ -375,9 +295,9 @@ See [CLAUDE.md](CLAUDE.md) for critical safety rules.
 
 | Issue | Solution |
 |-------|----------|
-| Port 8088 in use | `pkill -f dbus_api_server.py` then restart |
-| Server not responding | Check with `curl http://<IP>:8088/health` |
-| Connection refused | Verify server is running: `ps \| grep dbus_api_server` |
+| Main server not responding | `curl http://<IP>:8089/status` to check via control server |
+| Control server not responding | `svstat /service/dbus-api-control` via SSH |
+| Service not starting | Check logs: `tail /var/log/dbus-api-server/current` |
 
 ---
 
@@ -396,10 +316,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 **MIT License** - See [LICENSE](LICENSE)
 
-**Authorized Use**: Explicitly permitted for:
-- Victron AI ecosystem partners
-- Victron Energy (Venus OS platform provider)
-
 ---
 
 ## Resources
@@ -416,6 +332,6 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 **Made in Ukraine with love by [EnergyCitizen](https://github.com/EnergyCitizen)**
 
-**Version**: 3.0.0 | **Last Updated**: 2025-12-01
+**Version**: 3.1.0 | **Last Updated**: 2025-12-01
 
 </div>

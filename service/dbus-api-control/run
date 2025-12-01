@@ -1,0 +1,15 @@
+#!/bin/sh
+# Victron DBus API Control Server - daemontools run script
+# Control server for service management (port 8089)
+
+exec 2>&1
+
+INSTALL_DIR="/data/dbus-api"
+SCRIPT="dbus_api_control.py"
+
+cd "$INSTALL_DIR" || exit 1
+
+# Small delay to allow main server to start first
+sleep 2
+
+exec python3 "$INSTALL_DIR/$SCRIPT"

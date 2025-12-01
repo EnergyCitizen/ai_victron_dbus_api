@@ -1,0 +1,63 @@
+[
+    {
+        "id": "6a7aeab51e5dd6e9",
+        "type": "victron-virtual",
+        "z": "1fb7f5b976e694f6",
+        "name": "AI_write",
+        "outputs": 2,
+        "device": "switch",
+        "default_values": false,
+        "acload_nrofphases": 1,
+        "enable_s2support": false,
+        "battery_capacity": 25,
+        "include_battery_temperature": false,
+        "battery_voltage_preset": "24",
+        "battery_voltage_custom": 24,
+        "generator_type": "ac",
+        "generator_nrofphases": 1,
+        "include_engine_hours": false,
+        "include_starter_voltage": false,
+        "include_history_energy": false,
+        "grid_nrofphases": 1,
+        "include_motor_temp": false,
+        "include_controller_temp": false,
+        "include_coolant_temp": false,
+        "include_motor_rpm": true,
+        "include_motor_direction": true,
+        "position": 0,
+        "pvinverter_nrofphases": 1,
+        "switch_1_type": 1,
+        "switch_1_initial": 0,
+        "switch_1_label": "",
+        "switch_1_customname": "ai_write",
+        "switch_1_group": "safeguard",
+        "switch_1_include_measurement": false,
+        "switch_1_rgb_color_wheel": false,
+        "switch_1_cct_wheel": false,
+        "switch_1_rgb_white_dimmer": false,
+        "fluid_type": 0,
+        "include_tank_battery": false,
+        "include_tank_temperature": false,
+        "tank_battery_voltage": 3.3,
+        "tank_capacity": 0.2,
+        "temperature_type": 2,
+        "include_humidity": false,
+        "include_pressure": false,
+        "include_temp_battery": false,
+        "temp_battery_voltage": 3.3,
+        "x": 140,
+        "y": 480,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e801468ce64d5544",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@victronenergy/node-red-contrib-victron": "1.6.55"
+        }
+    }
+]

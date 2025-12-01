@@ -21,7 +21,7 @@ By the end of this tutorial, you will:
 
 ## User Story
 
-**As Mauk (AI Agent Developer at El Niño)**, I want my fleet agent to predict hardware failures before they happen, so I can schedule maintenance during customer off-hours and avoid $10k+ emergency service calls.
+**As an AI Agent Developer**, I want my fleet agent to predict hardware failures before they happen, so I can schedule maintenance during customer off-hours and avoid $10k+ emergency service calls.
 
 **Business Value**:
 - Avoid emergency service premiums (save $5k-15k per incident)

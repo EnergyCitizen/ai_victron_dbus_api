@@ -4,12 +4,11 @@ This documentation is designed for two primary personas who interact with Victro
 
 ---
 
-## 🤖 Persona 1: Mauk Muller - AI Agent Developer
+## 🤖 Persona 1: AI Agent Developer
 
 ### Background
-- **Company**: El Niño (Victron AI ecosystem partner)
+- **Company**: Victron AI ecosystem partner
 - **Role**: Senior AI Agent Developer
-- **Location**: Netherlands
 - **Experience**: 10+ years software development, 2 years AI/ML
 
 ### Responsibilities
@@ -36,11 +35,11 @@ This documentation is designed for two primary personas who interact with Victro
 - **Tooling**: Uses Claude, ChatGPT, and custom AI agents for development
 
 ### Typical User Stories
-1. **As Mauk**, I want my AI agent to alert me when any site's battery SOC drops below 20%
-2. **As Mauk**, I want to ask "Which sites have battery degradation?" and get ranked results
-3. **As Mauk**, I want the agent to proactively suggest maintenance based on trends
-4. **As Mauk**, I want to predict battery failures 3-6 months in advance
-5. **As Mauk**, I want to compare solar production across similar installations
+1. **As an AI Developer**, I want my AI agent to alert me when any site's battery SOC drops below 20%
+2. **As an AI Developer**, I want to ask "Which sites have battery degradation?" and get ranked results
+3. **As an AI Developer**, I want the agent to proactively suggest maintenance based on trends
+4. **As an AI Developer**, I want to predict battery failures 3-6 months in advance
+5. **As an AI Developer**, I want to compare solar production across similar installations
 
 ### Information Needs
 
@@ -71,7 +70,7 @@ This documentation is designed for two primary personas who interact with Victro
 - Diagnostic path reference tables
 
 ### Success Criteria
-After using documentation, Mauk can:
+After using documentation, an AI Developer can:
 - Build working monitoring agent in <2 hours
 - Implement conversational patterns (not just API calls)
 - Find threshold values without reading 47KB technical docs
@@ -162,7 +161,7 @@ After using documentation, an Installer can:
 
 ## Key Differences
 
-| Aspect | Mauk (AI Developer) | Installer |
+| Aspect | AI Developer | Installer |
 |--------|---------------------|-----------|
 | **Scale** | 50-100+ installations | 1-10 installations |
 | **Interaction** | Builds AI agents for users | Uses AI agents directly |
@@ -187,7 +186,7 @@ Both personas need:
 
 ## Documentation Strategy
 
-### For Mauk (AI Agent Developer)
+### For AI Agent Developer
 **docs/ai-agent-developer/**
 - Focus: User stories → conversational patterns → API calls
 - Style: "Users ask agent X, agent does Y, here's the implementation"
@@ -212,7 +211,7 @@ Both personas need:
 ## Version History
 
 - **v1.0** (2025-10-23): Initial persona definitions
-- Based on: Real feedback from El Niño team and Victron installers
+- Based on: Real feedback from AI ecosystem partners and Victron installers
 - Next: User story validation with actual users
 
 ---

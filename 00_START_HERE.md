@@ -12,8 +12,8 @@ Welcome! This guide will route you to the right documentation based on your role
 
 ### 🤖 AI Agent Developer
 
-**You are**: Mauk Muller (or similar)
-**Company**: El Niño, building AI monitoring solutions
+**You are**: An AI Agent Developer
+**Company**: Building AI monitoring solutions for Victron
 **Goal**: Build conversational agents for Victron fleet monitoring
 
 **Your Question**:
@@ -56,7 +56,7 @@ Welcome! This guide will route you to the right documentation based on your role
 
 ```
 docs/
-├── ai-agent-developer/     # For Mauk - Build AI monitoring agents
+├── ai-agent-developer/     # Build AI monitoring agents
 │   ├── tutorials/          # Learn step-by-step (30-120 min)
 │   ├── how-to-guides/      # Solve specific problems (10-30 min)
 │   ├── concepts/           # Understand "why" (15-25 min)
@@ -97,7 +97,7 @@ docs/
 
 ### Recommended First Steps
 
-**If you're Mauk (AI Developer)**:
+**If you're an AI Developer**:
 1. Read [PERSONAS.md](PERSONAS.md) - See your profile
 2. Start [Tutorial 01](docs/ai-agent-developer/tutorials/01-first-monitoring-agent.md) - 30 min
 3. Build your first agent

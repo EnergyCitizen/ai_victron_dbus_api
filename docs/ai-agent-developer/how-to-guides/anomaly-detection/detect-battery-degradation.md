@@ -6,7 +6,7 @@ Guide for building AI agents that detect battery aging early and predict replace
 
 ## User Story
 
-**As Mauk (AI Agent Developer at El Niño)**, I want my fleet monitoring agent to detect battery degradation early, so that I can schedule replacements 3-6 months in advance and avoid $5k-20k emergency replacements.
+**As an AI Agent Developer**, I want my fleet monitoring agent to detect battery degradation early, so that I can schedule replacements 3-6 months in advance and avoid $5k-20k emergency replacements.
 
 ---
 

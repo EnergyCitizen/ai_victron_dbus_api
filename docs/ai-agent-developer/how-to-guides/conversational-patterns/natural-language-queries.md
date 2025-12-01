@@ -6,7 +6,7 @@ Guide for implementing conversational interfaces that let users ask about Victro
 
 ## User Story
 
-**As Mauk**, I want users to ask my AI agent questions in natural language (not write code), so that the agent is accessible to non-technical users.
+**As an AI Developer**, I want users to ask my AI agent questions in natural language (not write code), so that the agent is accessible to non-technical users.
 
 ---
 

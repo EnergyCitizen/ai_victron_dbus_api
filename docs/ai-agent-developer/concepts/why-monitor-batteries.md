@@ -290,7 +290,7 @@ Actual lifespan: ~10-15 years (temperature, depth of discharge, C-rate)
 
 ---
 
-## Case Study: El Niño Energy (50 Sites)
+## Case Study: Fleet Monitoring (50 Sites)
 
 **Before Monitoring** (Year 1):
 - Unexpected failures: 4 batteries
